@@ -4,6 +4,7 @@ from garminconnect import Garmin
 from datetime import date, timedelta
 import os
 import json
+import time
 
 # ==========================================
 #               KONFIGURACJA
@@ -102,6 +103,7 @@ def synchronizuj_garmin_do_sheets():
                 
                 # Dopisujemy okrążenie na koniec karty Laps
                 laps_sheet.append_row([akt_id, numer_lap, dystans_km, wynik_ruchu, tetno_int, kadencja_int])
+                time.sleep(1.2)
                 
         print("Synchronizacja zakończona sukcesem!")
         
