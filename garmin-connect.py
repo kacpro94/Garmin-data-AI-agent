@@ -27,7 +27,6 @@ def synchronizuj_garmin_do_sheets():
         google_client = gspread.authorize(creds)
         sheet = google_client.open(GOOGLE_SHEET_NAME)
         
-        activities_sheet = sheet.worksheet("Overall")
         laps_sheet = sheet.worksheet("Laps")
         
         # 2. Logowanie do Garmin Connect
@@ -45,36 +44,13 @@ def synchronizuj_garmin_do_sheets():
             print("Brak aktywności w zadanym okresie.")
             return
 
-        # Pobieramy obecną listę ID z arkusza podsumowań (Kolumna A)
-        existing_activities = activities_sheet.col_values(1)
         
         # Przetwarzamy chronologicznie (od najstarszych)
         for akt in aktywnosci[::-1]:
             akt_id = str(akt.get('activityId'))
             typ_treningu = akt.get('activityType', {}).get('typeKey', 'nieznany')
             data_startu = akt.get('startTimeLocal', 'N/A')
-            dystans_calkowity = round(akt.get('distance', 0) / 1000, 2)
-            kadencja = akt.get('averageRunningCadenceInStepsPerMinute') or akt.get('averageCyclingCadenceInRevolutionsPerMinute') or 0
-            kadencja_int = int(round(float(kadencja)))
-            
-            print(f"Przetwarzanie treningu {akt_id} ({typ_treningu})...")
-            
-            # --- ZAPIS / AKTUALIZACJA KARTY ACTIVITIES ---
-            if akt_id in existing_activities:
-                print(f"  Trening {akt_id} istnieje w Activities. Aktualizacja...")
-                row_index = existing_activities.index(akt_id) + 1
-                activities_sheet.update(f"A{row_index}", [[akt_id, data_startu, typ_treningu, dystans_calkowity, kadencja_int]])
-                
-                # Czyścimy stare okrążenia w karcie Laps (od dołu do góry)
-                print(f"  Czyszczenie starych okrążeń dla {akt_id} w karcie Laps...")
-                laps_id_col = laps_sheet.col_values(1)
-                for i in range(len(laps_id_col), 0, -1):
-                    if laps_id_col[i-1] == akt_id:
-                        laps_sheet.delete_rows(i)
-            else:
-                print(f"  Nowy trening {akt_id}. Dopisywanie do Activities...")
-                activities_sheet.append_row([akt_id, data_startu, typ_treningu, dystans_calkowity, kadencja_int])
-            
+ 
             # --- ZAPIS OKRĄŻEŃ DO KARTY LAPS ---
             splits = garmin_client.get_activity_splits(akt_id)
             odcinki_lap = splits.get('lapDTOs', [])
@@ -102,8 +78,8 @@ def synchronizuj_garmin_do_sheets():
                     wynik_ruchu = "0:00"
                 
                 # Dopisujemy okrążenie na koniec karty Laps
-                laps_sheet.append_row([akt_id, numer_lap, dystans_km, wynik_ruchu, tetno_int, kadencja_int])
-                #time.sleep(3)
+                laps_sheet.append_row([akt_id, numer_lap,data_startu, typ_treningu, dystans_km, wynik_ruchu, tetno_int, kadencja_int])
+                time.sleep(3)
                 
         print("Synchronizacja zakończona sukcesem!")
         
