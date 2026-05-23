@@ -22,7 +22,7 @@ def synchronizuj_garmin_do_sheets():
         # 1. Autoryzacja Google Sheets
         print("Łączenie z Google Sheets...")
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name(creds_dict, scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         google_client = gspread.authorize(creds)
         sheet = google_client.open(GOOGLE_SHEET_NAME)
         
