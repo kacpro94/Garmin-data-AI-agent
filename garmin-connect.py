@@ -77,7 +77,7 @@ def synchronizuj_garmin_do_sheets():
                     wynik_ruchu = "0:00"
                 
                 # Dopisujemy okrążenie na koniec karty Laps
-                laps_sheet.append_row([akt_id, numer_lap,data_startu, typ_treningu, dystans_km, wynik_ruchu, tetno_int, kadencja_int])
+                laps_sheet.insert_rows([[akt_id, numer_lap,data_startu, typ_treningu, dystans_km, wynik_ruchu, tetno_int, kadencja_int]], row=2)
                 time.sleep(3)
                 
         print("Synchronizacja zakończona sukcesem!")
