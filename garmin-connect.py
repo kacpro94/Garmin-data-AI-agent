@@ -35,7 +35,7 @@ def synchronizuj_garmin_do_sheets():
         garmin_client.login()
         
         dzis = date.today()
-        tydzien_temu = dzis - timedelta(days=300)
+        tydzien_temu = dzis - timedelta(days=1)
         print(f"Pobieranie aktywności od {tydzien_temu.isoformat()} do {dzis.isoformat()}...")
         aktywnosci = garmin_client.get_activities_by_date(tydzien_temu.isoformat(), dzis.isoformat())
         
